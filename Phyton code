@@ -1,0 +1,64 @@
+-	import cv2
+-	import numpy as np
+-	import matplotlib.pyplot as plt
+-	def load_image(image_path):
+-	"""Load and convert image to RGB format for display"""
+-	image = cv2.imread(image_path)
+-	if image is None:
+-	raise FileNotFoundError(f"Image not found at {image_path}")
+-	image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+-	return image, image_rgb
+-	def extract_color_features(image):
+-	"""Extract average color values for each channel"""
+-	average_color = image.mean(axis=(0, 1))
+-	return average_color
+-	def extract_shape_features(image_gray):
+-	"""Extract edge features using Canny edge detection"""
+-	edges = cv2.Canny(image_gray, threshold1=100, threshold2=200)
+-	return edges
+-	def extract_contours(image_gray):
+-	"""Extract contours from the image"""
+-	# Apply threshold to create binary image
+-	_, thresh = cv2.threshold(image_gray, 127, 255, cv2.THRESH_BINARY)
+-	# Find contours
+-	contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+-	# Create blank image for drawing contours
+-	contour_img = np.zeros_like(image_gray)
+-	# Draw all contours
+-	cv2.drawContours(contour_img, contours, -1, (255, 255, 255), 1)
+-	return contour_img
+-	def extract_pixel_features(image_gray):
+-	"""Extract raw pixel values from grayscale image"""
+-	pixel_features = image_gray.flatten()
+-	return pixel_features
+-	def display_results(original, processed, title1="Original Image", title2="Processed"):
+-	"""Display original and processed images side by side"""
+-	plt.figure(figsize=(10, 5))
+-	plt.subplot(1, 2, 1)
+-	plt.imshow(original)
+-	plt.title(title1)
+-	plt.axis("off")
+-	plt.subplot(1, 2, 2)
+-	plt.imshow(processed, cmap="gray")
+-	plt.title(title2)
+-	plt.axis("off")
+-	plt.show()
+-	def main():
+-	# Load the image (replace with your image path)
+-	image_path = "owl.jpg"
+-	image, image_rgb = load_image(image_path)
+-	image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+-	# 1. Color Features
+-	avg_color = extract_color_features(image)
+-	print("Average Color (B, G, R):", avg_color)
+-	# 2. Shape Features - Edge Detection
+-	edges = extract_shape_features(image_gray)
+-	display_results(image_rgb, edges, "Original Image", "Edge Detection")
+-	# 3. Shape Features - Contour Detection
+-	contours = extract_contours(image_gray)
+-	display_results(image_rgb, contours, "Original Image", "Contour Detection")
+-	# 4. Pixel Features
+-	pixel_features = extract_pixel_features(image_gray)
+-	print("Pixel Features (First 10 values):", pixel_features[:10])
+-	if __name__ == "__main__":
+-	main()
